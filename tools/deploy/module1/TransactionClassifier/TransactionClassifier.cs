@@ -19,7 +19,7 @@ namespace TransactionClassification
     public static class TransactionClassifier
     {
         private const string prompt = @"You are a data expert working for the National Library of Scotland.
-You are analysing all transactions over £25,000 in value and classifying them into one of five categories.
+You are analysing all transactions over ï¿½25,000 in value and classifying them into one of five categories.
 The five categories are Building Improvement, Literature & Archive, Utility Bills, Professional Services and Software/IT.
 If you can't tell what it is, say Could not classify
 
@@ -36,7 +36,7 @@ The classification is:";
         {
             // Get the blob information from the event grid event.
             var data = ((JObject)eventGridEvent.Data).ToObject<StorageBlobCreatedEventData>();
-            // retrieve continer name from URL field ("https://egblobstore.blob.core.windows.net/{containername}/blobname.jpg") of the event grid event
+            // retrieve container name from URL field ("https://egblobstore.blob.core.windows.net/{containername}/blobname.jpg") of the event grid event
             var containerName = data.Url.Split('/')[3];
             // retrieve blob name from URL field ("https://egblobstore.blob.core.windows.net/containername/{blobname}.jpg") of the event grid event
             var blobName = data.Url.Split('/')[4];
