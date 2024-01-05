@@ -24,18 +24,25 @@ resource storageAccount 'Microsoft.Storage/storageAccounts@2022-09-01' = {
 }
 
 resource blobService 'Microsoft.Storage/storageAccounts/blobServices@2022-09-01' = {
-  name: 'default'
+  name: 'openai'
   parent: storageAccount
 }
 
 
 // Create storage containers
 resource classificationContainer 'Microsoft.Storage/storageAccounts/blobServices/containers@2022-09-01' = {
-  name: 'openai/datasets/classifier'
+  name: 'openai/datasets/'
+  resource parentContainer 'Microsoft.Storage/storageAccounts/blobServices/containers@2022-09-01' = {
+    name: 'openai'
+    parent: blobService
+    properties: {
+      publicAccess: 'Blob'
+    }
+  }
 
   resource childContainer 'Microsoft.Storage/storageAccounts/blobServices/containers@2022-09-01' = {
-    name: 'datasets/classifier'
-    parent: openai
+    name: 'openai/datasets'
+    parent: parentContainer
     properties: {
       publicAccess: 'Blob'
     }
