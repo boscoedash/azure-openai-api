@@ -20,34 +20,25 @@ resource storageAccount 'Microsoft.Storage/storageAccounts@2022-09-01' = {
   sku: {
     name: 'Standard_LRS'
   }
-  kind: 'StorageV2'
+  kind: storageAccountType
 }
 
 resource blobService 'Microsoft.Storage/storageAccounts/blobServices@2022-09-01' = {
-  name: '${storageAccount.name}/default'
-  dependsOn: [
-    storageAccount
-  ]
+  name: 'default'
+  parent: storageAccount
 }
 
 resource openaiContainer 'Microsoft.Storage/storageAccounts/blobServices/containers@2022-09-01' = {
-  name: '${blobService.name}/openai'
-  dependsOn: [
-    blobService
-  ]
+  name: 'openai'
+  parent: blobService
   properties: {
     publicAccess: 'Blob'
   }
 }
 
 resource datasetsBlob 'Microsoft.Storage/storageAccounts/blobServices/containers/blobs@2022-09-01' = {
-  name: '${openaiContainer.name}/datasets'
-  dependsOn: [
-    openaiContainer
-  ]
-  properties: {
-    type: 'Block'
-  }
+  name: 'datasets'
+  parent: openaiContainer
 }
 
 resource outputContainer 'Microsoft.Storage/storageAccounts/blobServices/containers@2022-09-01' = {
