@@ -18,39 +18,35 @@ resource storageAccount 'Microsoft.Storage/storageAccounts@2022-09-01' = {
   name: storageAccountName
   location: location
   sku: {
-    name: storageAccountType
+    name: 'Standard_LRS'
   }
   kind: 'StorageV2'
 }
 
 resource blobService 'Microsoft.Storage/storageAccounts/blobServices@2022-09-01' = {
-  name: 'openai'
-  parent: storageAccount
+  name: '${storageAccount.name}/default'
+  dependsOn: [
+    storageAccount
+  ]
 }
 
-
-// Create storage containers
-resource classificationContainer 'Microsoft.Storage/storageAccounts/blobServices/containers@2022-09-01' = {
-  name: 'openai/datasets/'
-  resource parentContainer 'Microsoft.Storage/storageAccounts/blobServices/containers@2022-09-01' = {
-    name: 'openai'
-    parent: blobService
-    properties: {
-      publicAccess: 'Blob'
-    }
-  }
-
-  resource childContainer 'Microsoft.Storage/storageAccounts/blobServices/containers@2022-09-01' = {
-    name: 'openai/datasets'
-    parent: parentContainer
-    properties: {
-      publicAccess: 'Blob'
-    }
-  }
-  parent: blobService
- 
+resource openaiContainer 'Microsoft.Storage/storageAccounts/blobServices/containers@2022-09-01' = {
+  name: '${blobService.name}/openai'
+  dependsOn: [
+    blobService
+  ]
   properties: {
     publicAccess: 'Blob'
+  }
+}
+
+resource datasetsBlob 'Microsoft.Storage/storageAccounts/blobServices/containers/blobs@2022-09-01' = {
+  name: '${openaiContainer.name}/datasets'
+  dependsOn: [
+    openaiContainer
+  ]
+  properties: {
+    type: 'Block'
   }
 }
 
