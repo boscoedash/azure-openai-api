@@ -1,6 +1,6 @@
 // Declare parameters
 @description('The unique name for the Azure Storage Account.')
-param storageAccountName string = 'opai${uniqueString(resourceGroup().id)}'
+param storageAccountName string = 'stabhlokanaai01'
 
 @description('The unique name for the Azure Function App.')
 param functionAppName string = 'xact-classifier-openai-${uniqueString(resourceGroup().id)}'
@@ -31,7 +31,15 @@ resource blobService 'Microsoft.Storage/storageAccounts/blobServices@2022-09-01'
 
 // Create storage containers
 resource classificationContainer 'Microsoft.Storage/storageAccounts/blobServices/containers@2022-09-01' = {
-  name: 'classification'
+  name: 'openai/datasets/classifier'
+
+  resource childContainer 'Microsoft.Storage/storageAccounts/blobServices/containers@2022-09-01' = {
+    name: 'openai/datasets/classifier'
+    parent: parentContainer
+    properties: {
+      publicAccess: 'Blob'
+    }
+  }
   parent: blobService
  
   properties: {

@@ -1,0 +1,28 @@
+# set github user name from command line argument
+$github_username = $args[0]
+if ([string]::IsNullOrEmpty($github_username)) {
+	Write-Host "Usage: $0 github_username"
+	exit
+}
+
+$resourceGroupName = $args[1]
+if ([string]::IsNullOrEmpty($resourceGroupName)) {
+	$resourceGroupName = "openai-levelup-rg"
+}
+
+(Get-Content -Path tools/deploy/module0/credential.json) -replace 'your-github-username', $github_username | Set-Content -Path tools/deploy/module0/credential.json
+
+# Create an Azure AD application
+$uniqueAppName = -join ((65..90) + (97..122) + (48..57) | Get-Random -Count 10 | % {[char]$_})
+$appId = az ad app create --display-name $uniqueAppName --query appId --output tsv
+Write-Host "appId is $appId"
+
+# Create a service principal for the Azure AD app.
+$assigneeObjectId = az ad sp create --id $appId --query id --output tsv
+
+# Create a role assignment for the Azure AD app.
+$subscriptionId = az account show --query id --output tsv
+az role assignment create --role Contributor --subscription $subscriptionId --assignee-object-id  $assigneeObjectId --assignee-principal-type ServicePrincipal --scope /subscriptions/$subscriptionId/resourceGroups/$resourceGroupName
+
+# Create a federated identity credential on the Azure AD app.
+az ad app federated-credential create --id $appId --parameters tools/deploy/module0/credential.json
