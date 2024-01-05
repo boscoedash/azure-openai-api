@@ -34,8 +34,8 @@ resource classificationContainer 'Microsoft.Storage/storageAccounts/blobServices
   name: 'openai/datasets/classifier'
 
   resource childContainer 'Microsoft.Storage/storageAccounts/blobServices/containers@2022-09-01' = {
-    name: 'openai/datasets/classifier'
-    parent: parentContainer
+    name: 'datasets/classifier'
+    parent: openai
     properties: {
       publicAccess: 'Blob'
     }
