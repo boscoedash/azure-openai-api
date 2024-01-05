@@ -29,16 +29,13 @@ resource blobService 'Microsoft.Storage/storageAccounts/blobServices@2022-09-01'
 }
 
 resource openaiContainer 'Microsoft.Storage/storageAccounts/blobServices/containers@2022-09-01' = {
-  name: 'openai'
-  parent: blobService
+  name: 'default/openai/datasets'
+  dependsOn: [
+    blobService
+  ]
   properties: {
     publicAccess: 'Blob'
   }
-}
-
-resource datasetsBlob 'Microsoft.Storage/storageAccounts/blobServices/containers/blobs@2022-09-01' = {
-  name: 'datasets'
-  parent: openaiContainer
 }
 
 resource outputContainer 'Microsoft.Storage/storageAccounts/blobServices/containers@2022-09-01' = {
